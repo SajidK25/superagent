@@ -26,7 +26,7 @@ services:
       - db
     ports:
       - 8081:8080
-    command: bash -c "prisma migrate dev"
+    # command: bash -c "prisma migrate dev"
     labels:
       - "traefik.enable=true"
       # - "traefik.docker.network=auto-gpt.tech"
