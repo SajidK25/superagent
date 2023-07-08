@@ -1,0 +1,76 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres
+    container_name: postgres
+    restart: always
+    environment:
+      - POSTGRES_DB=rapid_superagent
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=rapid_superagent
+      - POSTGRES_HOST=127.0.0.1
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5232
+    networks:
+      - default
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backend-rapid_superagent
+    depends_on:
+      - db
+    ports:
+      - 8081:8080
+    labels:
+      - "traefik.enable=true"
+      # - "traefik.docker.network=auto-gpt.tech"
+      - "traefik.http.routers.backend-insecure.rule=Host(`backend.rapidagent.ai`)"
+      - "traefik.http.routers.backend-insecure.entrypoints=web"
+      - "traefik.http.middlewares.backend-redirect-web-secure.redirectscheme.scheme=https"
+      - "traefik.http.routers.backend-insecure.middlewares=backend-redirect-web-secure"
+      - "traefik.http.routers.backend.rule=Host(`backend.rapidagent.ai`)"
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.backend.tls=true"
+      - "traefik.http.routers.backend.tls.certresolver=myresolver"
+      - "traefik.http.services.backend-insecure.loadbalancer.server.port=8080"
+    env_file:
+      - ./.env
+    networks:
+      - default
+  ui:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    container_name: ui-rapid_superagent
+    ports:
+      - '3005:3000'
+    labels:
+      - "traefik.enable=true"
+      # - "traefik.docker.network=auto-gpt.tech"
+      - "traefik.http.routers.ui-insecure.rule=Host(`api.rapidagent.ai`)"
+      - "traefik.http.routers.ui-insecure.entrypoints=web"
+      - "traefik.http.middlewares.ui-redirect-web-secure.redirectscheme.scheme=https"
+      - "traefik.http.routers.ui-insecure.middlewares=ui-redirect-web-secure"
+      - "traefik.http.routers.ui.rule=Host(`api.rapidagent.ai`)"
+      - "traefik.http.routers.ui.entrypoints=websecure"
+      - "traefik.http.routers.ui.tls=true"
+      - "traefik.http.routers.ui.tls.certresolver=myresolver"
+      - "traefik.http.services.ui-insecure.loadbalancer.server.port=3000"
+    depends_on:
+      - backend
+    env_file:
+      - ./ui/.env
+    networks:
+      - default
+
+volumes:
+  db_data:
+
+networks:
+  auto-gpt.tech:
+    external: true
