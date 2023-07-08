@@ -11,10 +11,15 @@ app = FastAPI(
     description="Bring your agents to production",
     version="0.0.7",
 )
-
+origins= [
+    "https://api.rapidagent.ai",
+    "http://api.rapidagent.ai",
+    "https://localhost:3000",
+    "http://localhost:3000"
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
