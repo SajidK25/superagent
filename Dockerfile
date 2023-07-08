@@ -25,7 +25,8 @@ COPY --from=builder /app/.venv /app/.venv
 
 COPY . ./
 
-RUN prisma generate
+RUN prisma generate && \
+    prisma migrate dev
 
 # Bind the port and refer to the app.py app
 CMD exec gunicorn --bind :$PORT --workers 2 --timeout 0  --worker-class uvicorn.workers.UvicornWorker  --threads 8 app.main:app
