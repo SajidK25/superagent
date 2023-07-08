@@ -1,7 +1,8 @@
 import time
 
 from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
+# from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.cors import CORSMiddleware
 
 from app.lib.prisma import prisma
 from app.routers import router
