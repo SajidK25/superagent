@@ -1,7 +1,8 @@
 import time
 
 from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
+# from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.cors import CORSMiddleware
 
 from app.lib.prisma import prisma
 from app.routers import router
@@ -11,13 +12,20 @@ app = FastAPI(
     description="Bring your agents to production",
     version="0.0.7",
 )
-
+origins= [
+    "https://api.rapidagent.ai",
+    "http://api.rapidagent.ai",
+    "https://localhost:3000",
+    "http://localhost:3000",
+    "https://backend.rapidagent.ai",
+    "http://backend.rapidagent.ai"
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET","POST","PUT","PATCH","DELETE"],
+    allow_headers=["Access-Control-Allow-Origin"],
 )
 
 
